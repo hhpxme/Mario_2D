@@ -21,6 +21,8 @@ public class Player extends MapObject {
 	private int fire;
 	private int maxFire;
 	private boolean dead;
+	private boolean over;
+	private boolean winner;
 	private boolean flinching;
 	private long flinchTimer;
 	
@@ -54,6 +56,10 @@ public class Player extends MapObject {
 	private static final int KNOCKING = 6;
 	private static final int DEAD = 7;
 
+	//win lose stt
+	private boolean lose = false;
+	private boolean win = false;
+
 	public int getHP() {
 		return HP;
 	}
@@ -69,15 +75,8 @@ public class Player extends MapObject {
 	public boolean isDead() {
 		return dead;
 	}
-
-
-	public void setHP(int HP) {
-		this.HP = HP;
-	}
-
-	public void setDead(boolean dead) {
-		this.dead = dead;
-	}
+	public boolean isLose() { return lose; }
+	public boolean isWin() { return win; }
 
 	public void setFiring() {
 		firing = true;
@@ -124,7 +123,7 @@ public class Player extends MapObject {
 			BufferedImage spriteSheet = ImageIO.read(new File("src/main/resources/Sprites/Player/playersprites.png"));
 			
 			sprites = new ArrayList<BufferedImage[]>();
-			for (int i = 0; i < 8; i++) {
+			for (int i = 0; i < numFrames.length; i++) {
 				BufferedImage[] bufferedImages = new BufferedImage[numFrames[i]];
 				
 				for (int j = 0; j < numFrames[i]; j++) {
@@ -145,7 +144,7 @@ public class Player extends MapObject {
 		animation = new Animation();
 		currentAction = IDLE;
 		animation.setFrames(sprites.get(IDLE));
-		animation.setDelay(400);
+		animation.setDelay(200);
 	}
 
 	public void checkAttack(ArrayList<Enemy> enemies) {
@@ -191,6 +190,7 @@ public class Player extends MapObject {
 			HP = 0;
 		}
 		if (HP == 0) {
+			flinching = false;
 			this.dead = true;
 		}
 
@@ -258,6 +258,7 @@ public class Player extends MapObject {
 			jumping = false;
 			left = false;
 			right = false;
+			flinching = false;
 		}
 	}
 	
@@ -311,7 +312,7 @@ public class Player extends MapObject {
 		}
 
 		// check drop hole
-		if (y > 227) {
+		if (y > 215) {
 			HP = 0;
 			dead = true;
 		}
@@ -333,10 +334,19 @@ public class Player extends MapObject {
 			}
 		} else if (dead) {
 			if (currentAction != DEAD) {
-				currentAction = DEAD;
 				animation.setFrames(sprites.get(DEAD));
 				animation.setDelay(100);
 				width = 30;
+				currentAction = DEAD;
+			} else {
+				animation.setFrames(sprites.get(DEAD));
+				animation.setDelay(100);
+				try {
+					Thread.sleep(500);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+				lose = true;
 			}
 		} else if (dY > 0) {
 			if (gliding) {
@@ -374,7 +384,6 @@ public class Player extends MapObject {
 				width = 30;
 			}
 		}
-		
 		animation.update();
 		
 		// set direction
