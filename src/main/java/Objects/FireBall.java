@@ -28,8 +28,8 @@ public class FireBall extends MapObject {
 		
 		width = 30;
 		height = 30;
-		boxWidth = 14;
-		boxHeight = 14;
+		boxWidth = 15;
+		boxHeight = 15;
 		
 		// load sprites
 		try {

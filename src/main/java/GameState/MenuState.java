@@ -2,9 +2,15 @@ package GameState;
 
 import Game.GamePanel;
 import TileMap.Background;
+import Fonts.*;
 
+import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.event.KeyEvent;
+import java.awt.image.BufferedImage;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
 
 public class MenuState extends GameState {
 	private Background background;
@@ -16,29 +22,37 @@ public class MenuState extends GameState {
 			"Quit"
 	};
 
-	private Color titleColor;
 	private Color selectionColor;
 	private Color nonSelectionColor;
 
-	private Font titleFont;
-	private Font font;
+	private Font selectionFont;
+
+	private NewFont newFont;
+
+	private BufferedImage logo;
 
 	public MenuState(GameStateManager gsm) {
 		this.gsm = gsm;
 
 		try {
-			background = new Background("src/main/resources/Backgrounds/menu_background.png", 1);
-			background.setVector(-0.1, 0);
+			background = new Background("src/main/resources/Backgrounds/menubg.png", 0);
+			background.setVector(0, 0);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
-		titleColor = new Color(242, 109, 125);
+		//Color
 		selectionColor = new Color(246, 107, 114);
-		nonSelectionColor = new Color(255, 255, 255);
+		nonSelectionColor = new Color(0, 0, 0);
 
-		titleFont = new Font("Century Gothic", Font.PLAIN, 32);
-		font = new Font("Arial", Font.PLAIN, 16);
+		newFont = new NewFont("src/main/resources/Fonts/pixel.ttf");
+		selectionFont = newFont.loadFont();
+
+		try {
+			logo = ImageIO.read(new File("src/main/resources/Icon/logo_320x240.png"));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	@Override
@@ -54,19 +68,16 @@ public class MenuState extends GameState {
 	@Override
 	public void draw(Graphics2D g) {
 		background.draw(g);
+		g.drawImage(logo, GamePanel.WIDTH / 2 - logo.getWidth() / 2, GamePanel.HEIGHT / 6, null);
 
-		g.setColor(titleColor);
-		g.setFont(titleFont);
-		g.drawString("Mario", GamePanel.WIDTH / 2 - g.getFontMetrics(titleFont).stringWidth("Mario") / 2, GamePanel.HEIGHT / 4);
-
-		g.setFont(font);
+		g.setFont(selectionFont.deriveFont(Font.PLAIN, 14));
 		for (int i = 0; i < menu.length; i++) {
 			if (i == currentSelection) {
 				g.setColor(selectionColor);
 			} else {
 				g.setColor(nonSelectionColor);
 			}
-			g.drawString(menu[i], GamePanel.WIDTH / 2 - g.getFontMetrics(font).stringWidth(menu[i]) / 2, GamePanel.HEIGHT / 2 + i * 25);
+			g.drawString(menu[i], GamePanel.WIDTH / 2 - g.getFontMetrics(selectionFont.deriveFont(Font.PLAIN, 14)).stringWidth(menu[i]) / 2, GamePanel.HEIGHT / 2 + 2 + i * 27);
 		}
 	}
 
@@ -75,7 +86,7 @@ public class MenuState extends GameState {
 			//Set State Level1
 			gsm.setState(GameStateManager.LEVEL1STATE);
 		} else if (currentSelection == 1) {
-
+			gsm.setState(GameStateManager.CREDITSSTATE);
 		} else if (currentSelection == 2) {
 			System.exit(0);
 		}

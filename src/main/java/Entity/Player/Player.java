@@ -2,7 +2,7 @@ package Entity.Player;
 
 import Animation.Animation;
 import Entity.Enemies.Enemy;
-import GameState.GameStateManager;
+import Entity.Items.Chest;
 import Objects.FireBall;
 import Objects.MapObject;
 import TileMap.Map2D;
@@ -12,7 +12,6 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.ArrayList;
-import java.util.HashMap;
 
 public class Player extends MapObject {
 	// player stuff
@@ -21,10 +20,11 @@ public class Player extends MapObject {
 	private int fire;
 	private int maxFire;
 	private boolean dead;
-	private boolean over;
-	private boolean winner;
+	private long deadTimer;
 	private boolean flinching;
 	private long flinchTimer;
+	private boolean dance;
+	private long danceTimer;
 	
 	// fireball
 	private boolean firing;
@@ -43,7 +43,7 @@ public class Player extends MapObject {
 	// animations
 	private ArrayList<BufferedImage[]> sprites;
 	private final int[] numFrames = {
-		2, 8, 1, 6, 3, 4, 2, 2
+		2, 8, 1, 6, 3, 4, 2, 2, 4
 	};
 	
 	// animation actions
@@ -55,10 +55,12 @@ public class Player extends MapObject {
 	private static final int FIREBALL = 5;
 	private static final int KNOCKING = 6;
 	private static final int DEAD = 7;
+	private static final int DANCE = 8;
 
 	//win lose stt
 	private boolean lose = false;
 	private boolean win = false;
+	private long time;
 
 	public int getHP() {
 		return HP;
@@ -105,6 +107,7 @@ public class Player extends MapObject {
 		stopJumpSpeed = 0.3;
 
 		dead = false;
+		dance = false;
 		
 		facingRight = true;
 		
@@ -112,11 +115,13 @@ public class Player extends MapObject {
 		fire = maxFire = 2500;
 		
 		fireCost = 200;
-		fireBallDamage = 5;
+		fireBallDamage = 4;
 		fireBalls = new ArrayList<FireBall>();
 		
-		knockDamage = 8;
-		knockRange = 40;
+		knockDamage = 5;
+		knockRange = 32;
+
+		time = 0;
 		
 		// load sprites
 		try {
@@ -144,7 +149,7 @@ public class Player extends MapObject {
 		animation = new Animation();
 		currentAction = IDLE;
 		animation.setFrames(sprites.get(IDLE));
-		animation.setDelay(200);
+		animation.setDelay(300);
 	}
 
 	public void checkAttack(ArrayList<Enemy> enemies) {
@@ -175,9 +180,19 @@ public class Player extends MapObject {
 			}
 			
 			// check enemy collision
-			if (intersects(e)) {
-				hit(e.getDamage());
+			if (!dead) {
+				if (intersects(e)) {
+					hit(e.getDamage());
+				}
 			}
+		}
+	}
+
+	public void checkWin(Chest chest) {
+		if (intersects(chest)) {
+			dance = true;
+			danceTimer = System.nanoTime();
+			left = true;
 		}
 	}
 	
@@ -190,12 +205,14 @@ public class Player extends MapObject {
 			HP = 0;
 		}
 		if (HP == 0) {
-			flinching = false;
-			this.dead = true;
+			dead = true;
+			deadTimer = System.nanoTime();
 		}
 
-		flinching = true;
-		flinchTimer = System.nanoTime();
+		if (!dead) {
+			flinching = true;
+			flinchTimer = System.nanoTime();
+		}
 	}
 	
 	private void getNextPosition() {
@@ -252,14 +269,6 @@ public class Player extends MapObject {
 				dY = maxFallSpeed;
 			}
 		}
-
-		if (dead) {
-			falling = false;
-			jumping = false;
-			left = false;
-			right = false;
-			flinching = false;
-		}
 	}
 	
 	public void update() {
@@ -311,10 +320,40 @@ public class Player extends MapObject {
 			}
 		}
 
-		// check drop hole
-		if (y > 215) {
+		if (y >= 210) {
 			HP = 0;
 			dead = true;
+			deadTimer = System.nanoTime();
+		}
+
+		// check done dead anim
+		if (dead) {
+			long elapsed = (System.nanoTime() - deadTimer) / 1000000;
+			System.out.println(elapsed);
+			if (elapsed > 1200) {
+				lose = true;
+			}
+			time++;
+			if (time == 3 && elapsed < 30) {
+				try {
+					Thread.sleep(400);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+				lose = true;
+			}
+		}
+
+		// check done dance anim
+		if (dance) {
+			long elapsed = (System.nanoTime() - danceTimer) / 1000000;
+			System.out.println(elapsed);
+			if (elapsed > 200) {
+				left = false;
+			}
+			if (elapsed > 1200) {
+				win = true;
+			}
 		}
 		
 		// set animation
@@ -333,20 +372,18 @@ public class Player extends MapObject {
 				width = 30;
 			}
 		} else if (dead) {
-			if (currentAction != DEAD) {
+			if (currentAction != DEAD || falling) {
+				currentAction = DEAD;
 				animation.setFrames(sprites.get(DEAD));
 				animation.setDelay(100);
 				width = 30;
-				currentAction = DEAD;
-			} else {
-				animation.setFrames(sprites.get(DEAD));
+			}
+		} else if (dance) {
+			if (currentAction != DANCE) {
+				currentAction = DANCE;
+				animation.setFrames(sprites.get(DANCE));
 				animation.setDelay(100);
-				try {
-					Thread.sleep(500);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-				lose = true;
+				width = 30;
 			}
 		} else if (dY > 0) {
 			if (gliding) {
@@ -380,7 +417,7 @@ public class Player extends MapObject {
 			if (currentAction != IDLE) {
 				currentAction = IDLE;
 				animation.setFrames(sprites.get(IDLE));
-				animation.setDelay(400);
+				animation.setDelay(300);
 				width = 30;
 			}
 		}
@@ -408,6 +445,13 @@ public class Player extends MapObject {
 		// draw player
 		if (flinching) {
 			long elapsed = (System.nanoTime() - flinchTimer) / 1000000;
+			if (elapsed / 100 % 2 == 0)
+				return;
+		}
+
+		// draw player
+		if (dead) {
+			long elapsed = (System.nanoTime() - deadTimer) / 1000000;
 			if (elapsed / 100 % 2 == 0)
 				return;
 		}

@@ -1,17 +1,18 @@
 package Audio;
 
 import javax.sound.sampled.*;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 
 public class SFX {
     private Clip clip;
 
     public SFX (String s) {
         try {
-            AudioInputStream ais = AudioSystem.getAudioInputStream(new File(s));
+            InputStream inputStream = new BufferedInputStream(new FileInputStream(s));
+//            AudioInputStream ais = AudioSystem.getAudioInputStream(inputStream);
+            AudioInputStream ais = AudioSystem.getAudioInputStream(inputStream);
             AudioFormat baseFormat = ais.getFormat();
-            AudioFormat decodeFormat = new AudioFormat(AudioFormat.Encoding.PCM_SIGNED, baseFormat.getSampleRate(), 16, baseFormat.getChannels(), baseFormat.getChannels() * 2, baseFormat.getSampleRate(), false);
+            AudioFormat decodeFormat = new AudioFormat(AudioFormat.Encoding.PCM_FLOAT, -1.0F, 64, 2, 4, -1.0F, true);
             AudioInputStream dais = AudioSystem.getAudioInputStream(decodeFormat, ais);
             clip = AudioSystem.getClip();
             clip.open(dais);

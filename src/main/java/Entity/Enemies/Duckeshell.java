@@ -8,14 +8,14 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 
-public class Slugger extends Enemy {
+public class Duckeshell extends Enemy {
 	private BufferedImage[] sprites;
-	
-	public Slugger(Map2D map2D) {
+
+	public Duckeshell(Map2D map2D) {
 		super(map2D);
 		
-		moveSpeed = 0.3;
-		maxSpeed = 0.3;
+		moveSpeed = 0.2;
+		maxSpeed = 0.2;
 		fallSpeed = 0.2;
 		maxFallSpeed = 10.0;
 		
@@ -24,14 +24,14 @@ public class Slugger extends Enemy {
 		boxWidth = 20;
 		boxHeight = 20;
 		
-		currentHP = maxHP = 1;
+		currentHP = maxHP = 10;
 		damage = 1;
 		
 		// load sprites
 		try {
-			BufferedImage spriteSheet = ImageIO.read(new File("src/main/resources/Sprites/Enemies/slugger.gif"));
+			BufferedImage spriteSheet = ImageIO.read(new File("src/main/resources/Sprites/Enemies/duckeshell.png"));
 			
-			sprites = new BufferedImage[3];
+			sprites = new BufferedImage[5];
 			for (int i = 0; i < sprites.length; i++) {
 				sprites[i] = spriteSheet.getSubimage(i * width, 0, width, height);
 			}
@@ -44,8 +44,8 @@ public class Slugger extends Enemy {
 		animation.setFrames(sprites);
 		animation.setDelay(300);
 		
-		right = true;
-		facingRight = true;
+		left = true;
+		facingRight = false;
 	}
 	
 	private void getNextPosition() {
@@ -73,6 +73,14 @@ public class Slugger extends Enemy {
 		getNextPosition();
 		mapCollision();
 		setPosition(xTemp, yTemp);
+
+		// check flinching
+		if (flinching) {
+			long elapsed = (System.nanoTime() - flinchTimer) / 1000000;
+			if (elapsed > 500) {
+				flinching = false;
+			}
+		}
 		
 		// if it hits a wall, go other direction
 		if (right && dX == 0) {
@@ -94,7 +102,6 @@ public class Slugger extends Enemy {
 		
 		super.draw(g);
 	}
-	
 }
 
 

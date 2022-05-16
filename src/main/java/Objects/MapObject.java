@@ -133,7 +133,7 @@ public abstract class MapObject {
 		
 		xTemp = x;
 		yTemp = y;
-		
+
 		boxCorners(x, yDest);
 		if (dY < 0) {
 			if (topLeft || topRight) {
@@ -173,7 +173,7 @@ public abstract class MapObject {
 		
 		if (!falling) {
 			boxCorners(x, yDest + 1);
-			if (!bottomLeft && !bottomRight) {
+			if (!bottomLeft && !bottomRight && currRow != 7) {
 				falling = true;
 			}
 		}
@@ -189,7 +189,7 @@ public abstract class MapObject {
 		yMap = map2D.getY();
 	}
 	
-	public void draw(java.awt.Graphics2D g) {
+	public void draw(Graphics2D g) {
 		if (facingRight) {
 			g.drawImage(animation.getImage(), (int)(x + xMap - width / 2), (int)(y + yMap - height / 2), null);
 		} else {

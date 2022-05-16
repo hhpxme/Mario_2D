@@ -1,8 +1,9 @@
 package GameState.Levels;
 
-import Audio.SFX;
+import Entity.Enemies.Duckeshell;
 import Entity.Enemies.Slugger;
 import Entity.Enemies.Enemy;
+import Entity.Items.Chest;
 import GameState.*;
 import Objects.Explosion;
 import Objects.HUD;
@@ -21,12 +22,21 @@ public class Level1State extends GameState {
 	private Player player;
 	
 	private ArrayList<Enemy> enemies;
-	private ArrayList<Enemy> enemiesInBossRoom;
 	private ArrayList<Explosion> explosions;
 	
 	private HUD hud;
 
-	//private SFX backgroundMusic;
+	//Boss room
+	private boolean lockBossRoom;
+	private double pPos;
+	private ArrayList<Enemy> listMiniBoss;
+	private int turn;
+	private boolean finishBoss;
+	private double chestX;
+	private double chestY;
+	private Chest chest;
+
+//	private SFX backgroundMusic;
 	
 	public Level1State(GameStateManager gsm) {
 		this.gsm = gsm;
@@ -43,26 +53,28 @@ public class Level1State extends GameState {
 		background = new Background("src/main/resources/Backgrounds/ing_background.png", 0.1);
 		
 		player = new Player(map2D);
-		player.setPosition(100, 100);
+		player.setPosition(4600, 110);
 		
 		populateEnemies();
-
-		if (player.getX() > 4700) {
-			enemiesBossRoom();
-		}
 		
 		explosions = new ArrayList<Explosion>();
 		
 		hud = new HUD(player);
 
-		//backgroundMusic = new SFX("src/main/resources/Music/bgmusic_1.wav");
-		//backgroundMusic.play();
+		lockBossRoom = false;
+		turn = 0;
+		finishBoss = false;
+
+//		backgroundMusic = new SFX("src/main/resources/Music/bgmusic_1.wav");
+//		backgroundMusic.play();
 	}
 	
 	private void populateEnemies() {
 		enemies = new ArrayList<Enemy>();
 		
 		Slugger s;
+		Duckeshell d;
+
 		Point[] points = new Point[] {
 				new Point(200, 200),
 				new Point(525, 110),
@@ -75,61 +87,48 @@ public class Level1State extends GameState {
 				new Point(2800, 170),
 				new Point(4300, 200),
 		};
+
 		for (int i = 0; i < points.length; i++) {
-			s = new Slugger(map2D);
-			s.setPosition(points[i].x, points[i].y);
-			enemies.add(s);
+			double numRandom = Math.random();
+			numRandom = numRandom * 100;
+			System.out.println((int)numRandom);
+			if ((int)numRandom % 2 == 0) {
+				s = new Slugger(map2D);
+				s.setPosition(points[i].x, points[i].y);
+				enemies.add(s);
+			} else {
+				d = new Duckeshell(map2D);
+				d.setPosition(points[i].x, points[i].y);
+				enemies.add(d);
+			}
 		}
 	}
 
-	private void enemiesBossRoom() {
-		enemiesInBossRoom = new ArrayList<Enemy>();
+	private void miniBoss() {
+		listMiniBoss = new ArrayList<Enemy>();
 
 		Slugger s;
+		Duckeshell d;
 		Point[] points = new Point[] {
-				new Point(4850, 150),
-				new Point(4800, 150),
-				new Point(4900, 150)
+				new Point(4850, 140),
+				new Point(4800, 140),
+				new Point(4900, 140)
 		};
 		for (int i = 0; i < points.length; i++) {
-			s = new Slugger(map2D);
-			s.setPosition(points[i].x, points[i].y);
-			enemies.add(s);
-		}
-	}
-
-	private void closeBossRoom() {
-		if (player.getX() >= 4670) {
-			map2D.loadMap("src/main/resources/Maps/map2.map");
-		}
-		if (player.getX() >= 4700) {
-			// update all enemies
-			for (int k = 0; k < 3; k++) {
-				for (int i = 0; i < enemiesInBossRoom.size(); i++) {
-					Enemy enemy = enemiesInBossRoom.get(i);
-					enemy.update();
-					if (enemy.isDead()) {
-						enemiesInBossRoom.remove(i);
-						i--;
-						explosions.add(new Explosion((int)enemy.getX(), (int)enemy.getY()));
-					}
-				}
-				if (k == 3) {
-					if (enemiesInBossRoom.size() == 1) {
-
-					}
-				}
-			}
-
-			// update explosions
-			for (int i = 0; i < explosions.size(); i++) {
-				explosions.get(i).update();
-				if (explosions.get(i).shouldRemove()) {
-					explosions.remove(i);
-					i--;
-				}
+			double numRandom = Math.random();
+			numRandom = numRandom * 100;
+			System.out.println((int)numRandom);
+			if ((int)numRandom % 2 == 0) {
+				s = new Slugger(map2D);
+				s.setPosition(points[i].x, points[i].y);
+				listMiniBoss.add(s);
+			} else {
+				d = new Duckeshell(map2D);
+				d.setPosition(points[i].x, points[i].y);
+				listMiniBoss.add(d);
 			}
 		}
+		turn += 1;
 	}
 
 	@Override
@@ -144,14 +143,14 @@ public class Level1State extends GameState {
 		// attack enemies
 		player.checkAttack(enemies);
 
-		System.out.println(player.getX() + ", " + player.getY());
+		//System.out.println(player.getX() + ", " + player.getY());
 		//System.out.println(map2D.getX() + ", " + map2D.getY());
 
 		if (player.isLose()) {
 			gsm.setState(GameStateManager.LOSESTATE);
 		}
 
-		if (map2D.getX() == -2890) {
+		if (player.isWin()) {
 			gsm.setState(GameStateManager.WINSTATE);
 		}
 		
@@ -175,7 +174,48 @@ public class Level1State extends GameState {
 			}
 		}
 
-		closeBossRoom();
+		if (lockBossRoom == false) {
+			pPos = player.getX();
+		} else {
+			pPos = 0;
+			player.checkAttack(listMiniBoss);
+			if (listMiniBoss.size() == 0) {
+				if (turn < 3) {
+					miniBoss();
+				}
+				if (finishBoss) {
+					chest = new Chest(map2D);
+					chest.setPosition(chestX, chestY);
+					System.out.println(chestX + ", " + chestY);
+					finishBoss = false;
+				}
+			}
+			if (turn <= 3) {
+				for (int i = 0; i < listMiniBoss.size(); i++) {
+					Enemy enemy = listMiniBoss.get(i);
+					enemy.update();
+					if (enemy.isDead()) {
+						listMiniBoss.remove(i);
+						i--;
+						explosions.add(new Explosion((int)enemy.getX(), (int)enemy.getY()));
+					}
+					if (listMiniBoss.size() == 1 && turn == 3) {
+						chestX = enemy.getX();
+						chestY = enemy.getY();
+						finishBoss = true;
+					}
+				}
+			}
+		}
+
+		//Lock boss room
+		if (pPos >= 4650) {
+			lockBossRoom = true;
+			map2D.loadMap("src/main/resources/Maps/map2.map");
+			miniBoss();
+		}
+
+		player.checkWin(chest);
 	}
 	
 	public void draw(Graphics2D g) {
@@ -188,10 +228,16 @@ public class Level1State extends GameState {
 			enemies.get(i).draw(g);
 		}
 
+		for (int i = 0; i < listMiniBoss.size(); i++) {
+			listMiniBoss.get(i).draw(g);
+		}
+
 		for (int i = 0; i < explosions.size(); i++) {
 			explosions.get(i).setMapPosition((int)map2D.getX(), (int)map2D.getY());
 			explosions.get(i).draw(g);
 		}
+
+		chest.draw(g);
 	}
 
 	@Override
