@@ -27,7 +27,8 @@ public class Explosion {
 		
 		width = 30;
 		height = 30;
-		
+
+		//Load sprite
 		try {
 			BufferedImage spriteSheet = ImageIO.read(new File("src/main/resources/Sprites/Enemies/explosion.gif"));
 			

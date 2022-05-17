@@ -44,6 +44,7 @@ public class CreditsState extends GameState {
 		titleColor = new Color(255, 255, 150);
 		memberColor = new Color(255, 255, 255);
 
+		//Load Font
 		newFont = new NewFont("src/main/resources/Fonts/pixel.ttf");
 		selectionFont = newFont.loadFont();
 
@@ -66,19 +67,25 @@ public class CreditsState extends GameState {
 
 	@Override
 	public void draw(Graphics2D g) {
+		//Draw bg
 		background.draw(g);
-		g.drawImage(logo, GamePanel.WIDTH / 2 - logo.getWidth() / 2, GamePanel.HEIGHT / 10, null);
-		g.setFont(selectionFont.deriveFont(Font.PLAIN, 14));
 
+		//Draw logo img
+		g.drawImage(logo, GamePanel.WIDTH / 2 - logo.getWidth() / 2, GamePanel.HEIGHT / 10, null);
+
+		//Draw title text
+		g.setFont(selectionFont.deriveFont(Font.PLAIN, 14));
 		g.setColor(titleColor);
 		g.drawString("DEVELOPMENT TEAM", GamePanel.WIDTH / 2 - g.getFontMetrics(selectionFont.deriveFont(Font.PLAIN, 14)).stringWidth("DEVELOPMENT TEAM") / 2, GamePanel.HEIGHT / 2 - 20);
 
+		//Draw name of team member
 		g.setFont(selectionFont.deriveFont(Font.PLAIN, 12));
 		g.setColor(memberColor);
 		for (int i = 0; i < menu.length; i++) {
 			g.drawString(menu[i], GamePanel.WIDTH / 2 - g.getFontMetrics(selectionFont.deriveFont(Font.PLAIN, 12)).stringWidth(menu[i]) / 2, GamePanel.HEIGHT / 2 + 10 + i * 30);
 		}
 
+		//Draw text: press esc
 		g.setFont(selectionFont.deriveFont(Font.PLAIN, 8));
 		g.setColor(Color.BLACK);
 		g.drawString("Press ESC to Menu", GamePanel.WIDTH / 2 - g.getFontMetrics(selectionFont.deriveFont(Font.PLAIN, 8)).stringWidth("Press ESC to Menu") / 2, GamePanel.HEIGHT - 10);

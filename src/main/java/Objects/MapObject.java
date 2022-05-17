@@ -8,27 +8,27 @@ import TileMap.Tile;
 import java.awt.*;
 
 public abstract class MapObject {
-	// tile stuff
+	//Tile stuff
 	protected Map2D map2D;
 	protected int tileSize;
 	protected double xMap;
 	protected double yMap;
 	
-	// position and vector
+	//Position and vector
 	protected double x;
 	protected double y;
 	protected double dX;
 	protected double dY;
 	
-	// dimensions
+	//Dimensions
 	protected int width;
 	protected int height;
 	
-	// collision box
+	//Box collision (collision of enemy, player, fireball,............)
 	protected int boxWidth;
 	protected int boxHeight;
 	
-	// collision
+	//Collision
 	protected int currRow;
 	protected int currCol;
 	protected double xDest;
@@ -40,13 +40,13 @@ public abstract class MapObject {
 	protected boolean bottomLeft;
 	protected boolean bottomRight;
 	
-	// animation
+	//Animation
 	protected Animation animation;
 	protected int currentAction;
 	protected int previousAction;
 	protected boolean facingRight;
 	
-	// movement
+	//Movement
 	protected boolean left;
 	protected boolean right;
 	protected boolean up;
@@ -54,7 +54,7 @@ public abstract class MapObject {
 	protected boolean jumping;
 	protected boolean falling;
 	
-	// movement attributes
+	//Movement attributes
 	protected double moveSpeed;
 	protected double maxSpeed;
 	protected double stopSpeed;
@@ -91,7 +91,7 @@ public abstract class MapObject {
 		this.jumping = jumping;
 	}
 
-	// constructor
+	//Constructor
 	public MapObject(Map2D map2D) {
 		this.map2D = map2D;
 		tileSize = map2D.getTileSize();

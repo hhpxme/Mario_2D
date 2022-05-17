@@ -27,7 +27,7 @@ public class Slugger extends Enemy {
 		currentHP = maxHP = 1;
 		damage = 1;
 		
-		// load sprites
+		//Load sprites
 		try {
 			BufferedImage spriteSheet = ImageIO.read(new File("src/main/resources/Sprites/Enemies/slugger.gif"));
 			
@@ -49,7 +49,7 @@ public class Slugger extends Enemy {
 	}
 	
 	private void getNextPosition() {
-		// movement
+		//Movement
 		if (left) {
 			dX -= moveSpeed;
 			if (dX < -maxSpeed) {
@@ -62,19 +62,19 @@ public class Slugger extends Enemy {
 			}
 		}
 		
-		// falling
+		//Falling
 		if (falling) {
 			dY += fallSpeed;
 		}
 	}
 	
 	public void update() {
-		// update position
+		//Update position
 		getNextPosition();
 		mapCollision();
 		setPosition(xTemp, yTemp);
-		
-		// if it hits a wall, go other direction
+
+		//If touch a wall, go other direction
 		if (right && dX == 0) {
 			right = false;
 			left = true;
@@ -85,7 +85,7 @@ public class Slugger extends Enemy {
 			facingRight = true;
 		}
 		
-		// update animation
+		//Update animation
 		animation.update();
 	}
 	

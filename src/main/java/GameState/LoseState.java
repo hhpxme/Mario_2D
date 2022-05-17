@@ -12,6 +12,7 @@ import java.io.File;
 import java.io.IOException;
 
 public class LoseState extends GameState {
+	//Mấy cái này same same mấy cái state kia nên k cmt lại nhá
 	private Background background;
 
 	private int currentSelection = 0;
@@ -43,6 +44,7 @@ public class LoseState extends GameState {
 		selectionColor = new Color(255, 115, 115);
 		nonSelectionColor = new Color(255, 255, 255);
 
+		//Font
 		newFont = new NewFont("src/main/resources/Fonts/pixel.ttf");
 		selectionFont = newFont.loadFont();
 

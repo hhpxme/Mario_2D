@@ -9,23 +9,20 @@ import java.awt.image.BufferedImage;
 import java.io.*;
 
 public class Map2D {
-	// position
+	//Position
 	private double x;
 	private double y;
-
-	//Hole Pos
-	private double holeX;
-	private double holeY;
 	
-	// bounds
+	//Bounds
 	private int xMin;
 	private int yMin;
 	private int xMax;
 	private int yMax;
-	
+
+	//tweening tech
 	private double tweening;
 	
-	// map
+	//Map in4
 	private int[][] map;
 	private int tileSize;
 	private int numRows;
@@ -33,23 +30,16 @@ public class Map2D {
 	private int width;
 	private int height;
 	
-	// tileset
+	//Tileset
 	private BufferedImage tileset;
 	private int numTilesAcross;
 	private Tile[][] tiles;
 	
-	// drawing
+	//Drawing
 	private int rowOffset;
 	private int colOffset;
 	private int numRowsToDraw;
 	private int numColsToDraw;
-
-	//death in last row
-	private boolean instantDeath;
-
-	public boolean isInstantDeath() {
-		return instantDeath;
-	}
 
 	public double getX() {
 		return x;
@@ -57,10 +47,6 @@ public class Map2D {
 
 	public double getY() {
 		return y;
-	}
-
-	public double getHoleY() {
-		return holeY;
 	}
 
 	public int getTileSize() {
@@ -163,11 +149,7 @@ public class Map2D {
 					break;
 				
 				if (map[row][col] == 0) {
-					if (col == 7) {
-						holeY = 227.5;
-					} else {
-						continue;
-					}
+					continue;
 				}
 				
 				int rc = map[row][col];

@@ -10,22 +10,22 @@ import java.awt.image.BufferedImage;
 
 @SuppressWarnings("serial")
 public class GamePanel extends JPanel implements Runnable, KeyListener{
-	// Dimensions
+	//Dimensions
 	public static final int WIDTH = 320;
 	public static final int HEIGHT = 240;
 	public static final int SCALE = 3;
 	
-	// game thread
+	//Game thread
 	private Thread thread;
 	private boolean running;
 	private int FPS = 60;
 	private long targetTime = 1000 / FPS;
 	
-	// image
+	//Image
 	private BufferedImage image;
 	private Graphics2D graphics2D;
 	
-	// game state manager
+	//Game State Manager
 	private GameStateManager gsm;
 	
 	public GamePanel() {
@@ -60,7 +60,7 @@ public class GamePanel extends JPanel implements Runnable, KeyListener{
 		long elapsed;
 		long wait;
 		
-		// game loop
+		//Game loop
 		while(running) {
 			start = System.nanoTime();
 			

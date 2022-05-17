@@ -43,11 +43,9 @@ public class Chest extends MapObject {
 	}
 	
 	public void update() {
-		// update position
 		mapCollision();
-		//setPosition(0, 0);
 
-		// update animation
+		//Update animation
 		animation.update();
 	}
 	

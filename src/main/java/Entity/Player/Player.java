@@ -14,7 +14,7 @@ import java.io.File;
 import java.util.ArrayList;
 
 public class Player extends MapObject {
-	// player stuff
+	//Player stuff
 	private int HP;
 	private int maxHP;
 	private int fire;
@@ -26,27 +26,27 @@ public class Player extends MapObject {
 	private boolean dance;
 	private long danceTimer;
 	
-	// fireball
+	//Fireball
 	private boolean firing;
 	private int fireCost;
 	private int fireBallDamage;
 	private ArrayList<FireBall> fireBalls;
 	
-	// knock
+	//Knocking (Gõ búa ý)
 	private boolean knocking;
 	private int knockDamage;
 	private int knockRange;
 	
-	// gliding
+	//Gliding
 	private boolean gliding;
 	
-	// animations
+	//Animations
 	private ArrayList<BufferedImage[]> sprites;
 	private final int[] numFrames = {
 		2, 8, 1, 6, 3, 4, 2, 2, 4
 	};
 	
-	// animation actions
+	//Animation actions
 	private static final int IDLE = 0;
 	private static final int WALKING = 1;
 	private static final int JUMPING = 2;
@@ -57,7 +57,7 @@ public class Player extends MapObject {
 	private static final int DEAD = 7;
 	private static final int DANCE = 8;
 
-	//win lose stt
+	//Win lose stt
 	private boolean lose = false;
 	private boolean win = false;
 	private long time;
@@ -123,7 +123,7 @@ public class Player extends MapObject {
 
 		time = 0;
 		
-		// load sprites
+		//Load sprites
 		try {
 			BufferedImage spriteSheet = ImageIO.read(new File("src/main/resources/Sprites/Player/playersprites.png"));
 			
@@ -153,11 +153,11 @@ public class Player extends MapObject {
 	}
 
 	public void checkAttack(ArrayList<Enemy> enemies) {
-		// loop through enemies
+		//Loop through enemies
 		for (int i = 0; i < enemies.size(); i++) {
 			Enemy e = enemies.get(i);
 			
-			// knock attack
+			//Knock attack
 			if (knocking) {
 				if (facingRight) {
 					if (e.getX() > x && e.getX() < x + knockRange && e.getY() > y - height / 2 && e.getY() < y + height / 2) {
@@ -170,7 +170,7 @@ public class Player extends MapObject {
 				}
 			}
 			
-			// fireballs
+			//Fireballs
 			for (int j = 0; j < fireBalls.size(); j++) {
 				if (fireBalls.get(j).intersects(e)) {
 					e.hit(fireBallDamage);
@@ -179,7 +179,7 @@ public class Player extends MapObject {
 				}
 			}
 			
-			// check enemy collision
+			//Check enemy collision
 			if (!dead) {
 				if (intersects(e)) {
 					hit(e.getDamage());
@@ -188,11 +188,16 @@ public class Player extends MapObject {
 		}
 	}
 
+	//Check player touch a chest
 	public void checkWin(Chest chest) {
 		if (intersects(chest)) {
 			dance = true;
 			danceTimer = System.nanoTime();
-			left = true;
+			if (y <= 4725) {
+				right = true;
+			} else {
+				left = true;
+			}
 		}
 	}
 	
@@ -216,7 +221,7 @@ public class Player extends MapObject {
 	}
 	
 	private void getNextPosition() {
-		// movement
+		//Movement
 		if (left) {
 			dX -= moveSpeed;
 			if (dX < -maxSpeed) {
@@ -241,18 +246,18 @@ public class Player extends MapObject {
 			}
 		}
 		
-		// cannot move while attacking and dead, except in air
+		//Cannot move while attacking and dead, except in air
 		if ((currentAction == KNOCKING || currentAction == FIREBALL || currentAction == DEAD) && !(jumping || falling || dead)) {
 			dX = 0;
 		}
 		
-		// jumping
+		//Jumping
 		if (jumping && !falling) {
 			dY = jumpStart;
 			falling = true;
 		}
 		
-		// falling
+		//Falling
 		if (falling) {
 			if (dY > 0 && gliding) {
 				dY += fallSpeed * 0.1;
@@ -272,12 +277,12 @@ public class Player extends MapObject {
 	}
 	
 	public void update() {
-		// update position
+		//Update position
 		getNextPosition();
 		mapCollision();
 		setPosition(xTemp, yTemp);
 
-		// check attack has stopped
+		//Check attack has stopped
 		if (currentAction == KNOCKING) {
 			if (animation.isPlay()) {
 				knocking = false;
@@ -289,7 +294,7 @@ public class Player extends MapObject {
 			}
 		}
 		
-		// fireball attack
+		//Fireball attack
 		fire += 1;
 		if (fire > maxFire) {
 			fire = maxFire;
@@ -303,7 +308,7 @@ public class Player extends MapObject {
 			}
 		}
 		
-		// update fireballs
+		//Update fireballs
 		for (int i = 0; i < fireBalls.size(); i++) {
 			fireBalls.get(i).update();
 			if (fireBalls.get(i).shouldRemove()) {
@@ -312,7 +317,7 @@ public class Player extends MapObject {
 			}
 		}
 		
-		// check done flinching
+		//Check done flinching
 		if (flinching) {
 			long elapsed = (System.nanoTime() - flinchTimer) / 1000000;
 			if (elapsed > 1000) {
@@ -326,7 +331,7 @@ public class Player extends MapObject {
 			deadTimer = System.nanoTime();
 		}
 
-		// check done dead anim
+		//Check done dead anim
 		if (dead) {
 			long elapsed = (System.nanoTime() - deadTimer) / 1000000;
 			System.out.println(elapsed);
@@ -344,19 +349,20 @@ public class Player extends MapObject {
 			}
 		}
 
-		// check done dance anim
+		//Check done dance anim
 		if (dance) {
 			long elapsed = (System.nanoTime() - danceTimer) / 1000000;
 			System.out.println(elapsed);
 			if (elapsed > 200) {
 				left = false;
+				right = false;
 			}
 			if (elapsed > 1200) {
 				win = true;
 			}
 		}
 		
-		// set animation
+		//Set animation
 		if (knocking) {
 			if (currentAction != KNOCKING) {
 				currentAction = KNOCKING;
@@ -437,21 +443,14 @@ public class Player extends MapObject {
 	public void draw(Graphics2D g) {
 		setMapPosition();
 		
-		// draw fireballs
+		//Draw fireballs
 		for(int i = 0; i < fireBalls.size(); i++) {
 			fireBalls.get(i).draw(g);
 		}
 		
-		// draw player
+		//Draw player when flinching
 		if (flinching) {
 			long elapsed = (System.nanoTime() - flinchTimer) / 1000000;
-			if (elapsed / 100 % 2 == 0)
-				return;
-		}
-
-		// draw player
-		if (dead) {
-			long elapsed = (System.nanoTime() - deadTimer) / 1000000;
 			if (elapsed / 100 % 2 == 0)
 				return;
 		}

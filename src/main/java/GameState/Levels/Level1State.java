@@ -32,6 +32,8 @@ public class Level1State extends GameState {
 	private ArrayList<Enemy> listMiniBoss;
 	private int turn;
 	private boolean finishBoss;
+
+	//Chest
 	private double chestX;
 	private double chestY;
 	private Chest chest;
@@ -117,7 +119,6 @@ public class Level1State extends GameState {
 		for (int i = 0; i < points.length; i++) {
 			double numRandom = Math.random();
 			numRandom = numRandom * 100;
-			System.out.println((int)numRandom);
 			if ((int)numRandom % 2 == 0) {
 				s = new Slugger(map2D);
 				s.setPosition(points[i].x, points[i].y);
@@ -133,28 +134,28 @@ public class Level1State extends GameState {
 
 	@Override
 	public void update() {
-		// update player
+		//Ipdate player
 		player.update();
 		map2D.setPosition(GamePanel.WIDTH / 2 - player.getX(), GamePanel.HEIGHT / 2 - player.getY());
 		
-		// set background
+		//Set background
 		background.setPosition(map2D.getX(), map2D.getY());
-		
-		// attack enemies
+
+		//Attack enemies
 		player.checkAttack(enemies);
 
 		//System.out.println(player.getX() + ", " + player.getY());
 		//System.out.println(map2D.getX() + ", " + map2D.getY());
 
+		//Set next state
 		if (player.isLose()) {
 			gsm.setState(GameStateManager.LOSESTATE);
 		}
-
 		if (player.isWin()) {
 			gsm.setState(GameStateManager.WINSTATE);
 		}
 		
-		// update all enemies
+		//Update all enemies
 		for (int i = 0; i < enemies.size(); i++) {
 			Enemy enemy = enemies.get(i);
 			enemy.update();
@@ -165,7 +166,7 @@ public class Level1State extends GameState {
 			}
 		}
 		
-		// update explosions
+		//Update explosions
 		for (int i = 0; i < explosions.size(); i++) {
 			explosions.get(i).update();
 			if (explosions.get(i).shouldRemove()) {
@@ -174,6 +175,7 @@ public class Level1State extends GameState {
 			}
 		}
 
+		//Create boss room
 		if (lockBossRoom == false) {
 			pPos = player.getX();
 		} else {
@@ -215,6 +217,7 @@ public class Level1State extends GameState {
 			miniBoss();
 		}
 
+		//Update chest
 		player.checkWin(chest);
 	}
 	
@@ -224,10 +227,12 @@ public class Level1State extends GameState {
 		hud.draw(g);
 		player.draw(g);
 
+		//Draw enemies
 		for (int i = 0; i < enemies.size(); i++) {
 			enemies.get(i).draw(g);
 		}
 
+		//Draw enemies in boss room
 		for (int i = 0; i < listMiniBoss.size(); i++) {
 			listMiniBoss.get(i).draw(g);
 		}
@@ -237,6 +242,7 @@ public class Level1State extends GameState {
 			explosions.get(i).draw(g);
 		}
 
+		//Draw chest
 		chest.draw(g);
 	}
 

@@ -40,7 +40,14 @@ public class Enemy extends MapObject {
 		flinchTimer = System.nanoTime();
 	}
 	
-	public void update() {}
+	public void update() {
+		//Draw enemy when flinching
+		if (flinching) {
+			long elapsed = (System.nanoTime() - flinchTimer) / 1000000;
+			if (elapsed / 100 % 2 == 0)
+				return;
+		}
+	}
 }
 
 

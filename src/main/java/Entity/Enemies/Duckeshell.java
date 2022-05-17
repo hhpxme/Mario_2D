@@ -27,7 +27,7 @@ public class Duckeshell extends Enemy {
 		currentHP = maxHP = 10;
 		damage = 1;
 		
-		// load sprites
+		//Load sprites
 		try {
 			BufferedImage spriteSheet = ImageIO.read(new File("src/main/resources/Sprites/Enemies/duckeshell.png"));
 			
@@ -49,7 +49,7 @@ public class Duckeshell extends Enemy {
 	}
 	
 	private void getNextPosition() {
-		// movement
+		//Movement
 		if (left) {
 			dX -= moveSpeed;
 			if (dX < -maxSpeed) {
@@ -62,19 +62,19 @@ public class Duckeshell extends Enemy {
 			}
 		}
 		
-		// falling
+		// Falling
 		if (falling) {
 			dY += fallSpeed;
 		}
 	}
 	
 	public void update() {
-		// update position
+		// Update position
 		getNextPosition();
 		mapCollision();
 		setPosition(xTemp, yTemp);
 
-		// check flinching
+		//Check flinching
 		if (flinching) {
 			long elapsed = (System.nanoTime() - flinchTimer) / 1000000;
 			if (elapsed > 500) {
@@ -82,7 +82,7 @@ public class Duckeshell extends Enemy {
 			}
 		}
 		
-		// if it hits a wall, go other direction
+		//If touch a wall, go other direction
 		if (right && dX == 0) {
 			right = false;
 			left = true;
@@ -93,7 +93,7 @@ public class Duckeshell extends Enemy {
 			facingRight = true;
 		}
 		
-		// update animation
+		//Update animation
 		animation.update();
 	}
 	
